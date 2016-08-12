@@ -5,4 +5,16 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+
+    <!--nav_header-->
+    <string name="nav_header_schedule">日程</string>
+    <string name="nav_header_wallet">账本</string>
+    <string name="nav_header_today">今日</string>
+    <string name="nav_header_weather">天气</string>
+    <string name="nav_header_others">其他</string>
+    <string name="nav_header_setting">设置</string>
+    <string name="nav_header_about">关于</string>
+    <string name="nav_header_exit">退出</string>
+
+
 </resources>
