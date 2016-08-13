@@ -3,6 +3,7 @@ package com.example.huanghuishun.myschedule.ui.activity;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -13,9 +14,12 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 import com.example.huanghuishun.myschedule.R;
 import com.example.huanghuishun.myschedule.ui.fragment.ScheduleFragment;
@@ -36,6 +40,8 @@ public abstract class BaseActivity extends AppCompatActivity
     private Toolbar toolbar;
     private ArrayList<Fragment> fragmentList;
     private static String title = "今日";
+    private CollapsingToolbarLayout collapsingToolbarLayout;
+    FrameLayout imageView;
 
     TodayFragment todayFragment = new TodayFragment();
     WeatherFragment weatherFragment = new WeatherFragment();
@@ -50,13 +56,18 @@ public abstract class BaseActivity extends AppCompatActivity
     @Override
     public void setContentView(@LayoutRes int layoutResID) {
         super.setContentView(layoutResID);
+
         initView();
     }
 
     private void initView() {
+        imageView = (FrameLayout) findViewById(R.id.test);
+
         fab = (FloatingActionButton) findViewById(R.id.fab);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle(title);
+        collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsinglayout);
+        collapsingToolbarLayout.setTitle(title);
+        collapsingToolbarLayout.setTitleEnabled(true);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -120,16 +131,18 @@ public abstract class BaseActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_today) {
-            toolbar.setTitle(R.string.nav_header_today);
+            collapsingToolbarLayout.setTitle(getResources().getString(R.string.nav_header_today));
             changeNavi(0);
         } else if (id == R.id.nav_weather) {
-            toolbar.setTitle(R.string.nav_header_weather);
+            collapsingToolbarLayout.setTitle(getResources().getString(R.string.nav_header_weather));
             changeNavi(1);
         } else if (id == R.id.nav_schedule) {
-            toolbar.setTitle(R.string.nav_header_schedule);
+            collapsingToolbarLayout.setTitle(getResources().getString(R.string.nav_header_schedule));
             changeNavi(2);
         } else if (id == R.id.nav_wallet) {
-            toolbar.setTitle(R.string.nav_header_wallet);
+            collapsingToolbarLayout.setTitle(getResources().getString(R.string.nav_header_wallet));
+
+            imageView.addView(LayoutInflater.from(this).inflate(R.layout.weather_collapsing,null));
             changeNavi(3);
         } else if (id == R.id.nav_setting) {
 
@@ -145,7 +158,7 @@ public abstract class BaseActivity extends AppCompatActivity
     }
 
     private void changeNavi(int index) {
-        title = toolbar.getTitle().toString();
+        title = collapsingToolbarLayout.getTitle().toString();
 
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragmentcontainer,fragmentList.get(index))
@@ -156,12 +169,12 @@ public abstract class BaseActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        toolbar.setTitle(title);
+        collapsingToolbarLayout.setTitle(title);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        title = toolbar.getTitle().toString();
+        title = collapsingToolbarLayout.getTitle().toString();
     }
 }
