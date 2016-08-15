@@ -26,6 +26,7 @@ import com.example.huanghuishun.myschedule.ui.fragment.ScheduleFragment;
 import com.example.huanghuishun.myschedule.ui.fragment.TodayFragment;
 import com.example.huanghuishun.myschedule.ui.fragment.WalletFragment;
 import com.example.huanghuishun.myschedule.ui.fragment.WeatherFragment;
+import com.example.huanghuishun.myschedule.utils.WeatherUtils;
 
 import java.util.ArrayList;
 
@@ -42,11 +43,13 @@ public abstract class BaseActivity extends AppCompatActivity
     private static String title = "今日";
     private CollapsingToolbarLayout collapsingToolbarLayout;
     FrameLayout imageView;
+    WeatherUtils weatherUtils;
 
     TodayFragment todayFragment = new TodayFragment();
     WeatherFragment weatherFragment = new WeatherFragment();
     ScheduleFragment scheduleFragment = new ScheduleFragment();
     WalletFragment walletFragment = new WalletFragment();
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,6 +64,9 @@ public abstract class BaseActivity extends AppCompatActivity
     }
 
     private void initView() {
+
+        weatherUtils = new WeatherUtils(this,"广州");
+
         imageView = (FrameLayout) findViewById(R.id.test);
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -135,14 +141,15 @@ public abstract class BaseActivity extends AppCompatActivity
             changeNavi(0);
         } else if (id == R.id.nav_weather) {
             collapsingToolbarLayout.setTitle(getResources().getString(R.string.nav_header_weather));
+
             changeNavi(1);
         } else if (id == R.id.nav_schedule) {
             collapsingToolbarLayout.setTitle(getResources().getString(R.string.nav_header_schedule));
             changeNavi(2);
         } else if (id == R.id.nav_wallet) {
             collapsingToolbarLayout.setTitle(getResources().getString(R.string.nav_header_wallet));
-
-            imageView.addView(LayoutInflater.from(this).inflate(R.layout.weather_collapsing,null));
+            imageView.removeAllViews();
+            imageView.addView(weatherUtils.getWeatherNav());
             changeNavi(3);
         } else if (id == R.id.nav_setting) {
 
@@ -177,4 +184,7 @@ public abstract class BaseActivity extends AppCompatActivity
         super.onPause();
         title = collapsingToolbarLayout.getTitle().toString();
     }
+
+
 }
+
