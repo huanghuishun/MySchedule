@@ -22,7 +22,7 @@
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
             >
             <FrameLayout
-                android:id="@+id/test"
+                android:id="@+id/naviView"
                 android:layout_width="match_parent"
                 android:layout_height="256dp"
                 android:fitsSystemWindows="true"

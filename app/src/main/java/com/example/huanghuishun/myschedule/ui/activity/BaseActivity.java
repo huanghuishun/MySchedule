@@ -26,6 +26,7 @@ import com.example.huanghuishun.myschedule.ui.fragment.ScheduleFragment;
 import com.example.huanghuishun.myschedule.ui.fragment.TodayFragment;
 import com.example.huanghuishun.myschedule.ui.fragment.WalletFragment;
 import com.example.huanghuishun.myschedule.ui.fragment.WeatherFragment;
+import com.example.huanghuishun.myschedule.utils.INaviChanger;
 import com.example.huanghuishun.myschedule.utils.WeatherUtils;
 
 import java.util.ArrayList;
@@ -35,14 +36,14 @@ import java.util.ArrayList;
  * Created by huanghuishun on 2016/8/11.
  */
 public abstract class BaseActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener,INaviChanger {
 
     private FloatingActionButton fab;
     private Toolbar toolbar;
     private ArrayList<Fragment> fragmentList;
-    private static String title = "今日";
+    private static String title;
     private CollapsingToolbarLayout collapsingToolbarLayout;
-    FrameLayout imageView;
+    FrameLayout naviView;
     WeatherUtils weatherUtils;
 
     TodayFragment todayFragment = new TodayFragment();
@@ -59,19 +60,15 @@ public abstract class BaseActivity extends AppCompatActivity
     @Override
     public void setContentView(@LayoutRes int layoutResID) {
         super.setContentView(layoutResID);
-
         initView();
     }
 
     private void initView() {
-
-        weatherUtils = new WeatherUtils(this,"广州");
-
-        imageView = (FrameLayout) findViewById(R.id.test);
-
+        naviView = (FrameLayout) findViewById(R.id.naviView);
         fab = (FloatingActionButton) findViewById(R.id.fab);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsinglayout);
+        title = "今日";
         collapsingToolbarLayout.setTitle(title);
         collapsingToolbarLayout.setTitleEnabled(true);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -147,10 +144,12 @@ public abstract class BaseActivity extends AppCompatActivity
             collapsingToolbarLayout.setTitle(getResources().getString(R.string.nav_header_schedule));
             changeNavi(2);
         } else if (id == R.id.nav_wallet) {
-            collapsingToolbarLayout.setTitle(getResources().getString(R.string.nav_header_wallet));
-            imageView.removeAllViews();
-            imageView.addView(weatherUtils.getWeatherNav());
             changeNavi(3);
+            collapsingToolbarLayout.setTitle(getResources().getString(R.string.nav_header_wallet));
+            weatherUtils = new WeatherUtils(this);
+            weatherUtils.setNaviChanger(this);
+            weatherUtils.queryWeather("广州");
+
         } else if (id == R.id.nav_setting) {
 
         } else if (id == R.id.nav_about) {
@@ -185,6 +184,10 @@ public abstract class BaseActivity extends AppCompatActivity
         title = collapsingToolbarLayout.getTitle().toString();
     }
 
-
+    @Override
+    public void changeNaviView(View view) {
+        naviView.removeAllViews();
+        naviView.addView(view);
+    }
 }
 

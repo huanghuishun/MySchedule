@@ -17,16 +17,15 @@ import com.example.huanghuishun.myschedule.R;
  */
 public class WeatherUtils implements WeatherSearch.OnWeatherSearchListener{
     private Context context;
-    private String placeName;
     private RelativeLayout weatherNav;
     private TextView textView;
+    private INaviChanger naviChanger;
 
-    public WeatherUtils(Context context, String placeName) {
-        this.placeName = placeName;
+    public WeatherUtils(Context context) {
         this.context = context;
         initview();
     }
-    public void queryWeather(){
+    public void queryWeather(String placeName){
         WeatherSearchQuery query = new WeatherSearchQuery(placeName,WeatherSearchQuery.WEATHER_TYPE_LIVE);
         WeatherSearch weatherSearch = new WeatherSearch(context);
         weatherSearch.setOnWeatherSearchListener(this);
@@ -34,20 +33,22 @@ public class WeatherUtils implements WeatherSearch.OnWeatherSearchListener{
         weatherSearch.searchWeatherAsyn();
     }
 
+    public void setNaviChanger(INaviChanger naviChanger) {
+        this.naviChanger = naviChanger;
+    }
+
     private void initview(){
         weatherNav = (RelativeLayout) LayoutInflater.from(context).inflate(R.layout.weathernav,null);
         textView = (TextView) weatherNav.findViewById(R.id.textView6);
     }
 
-    public RelativeLayout getWeatherNav(){
-        return weatherNav;
-    }
 
     @Override
     public void onWeatherLiveSearched(LocalWeatherLiveResult localWeatherLiveResult, int i) {
         if (i == 1000){
             if (localWeatherLiveResult != null && localWeatherLiveResult.getLiveResult() != null){
                 textView.setText(localWeatherLiveResult.getLiveResult().getWeather());
+                naviChanger.changeNaviView(weatherNav);
             }
         }
     }
@@ -56,4 +57,6 @@ public class WeatherUtils implements WeatherSearch.OnWeatherSearchListener{
     public void onWeatherForecastSearched(LocalWeatherForecastResult localWeatherForecastResult, int i) {
 
     }
+
+
 }
