@@ -8,18 +8,15 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 
 import com.example.huanghuishun.myschedule.R;
 import com.example.huanghuishun.myschedule.ui.fragment.ScheduleFragment;
@@ -43,6 +40,8 @@ public abstract class BaseActivity extends AppCompatActivity
     private ArrayList<Fragment> fragmentList;
     private static String title;
     private CollapsingToolbarLayout collapsingToolbarLayout;
+    private int[] pictureIds = new int[]{R.drawable.cloudy,R.drawable.cloudy2,R.drawable.cloudy3,R.drawable.cloudy4
+            ,R.drawable.rainy2,R.drawable.rainy1,R.drawable.snow,R.drawable.sunny,R.drawable.sunny2,R.drawable.sunny3};
     FrameLayout naviView;
     WeatherUtils weatherUtils;
 
@@ -83,6 +82,13 @@ public abstract class BaseActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
+
+        naviView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                naviView.setBackgroundResource(pictureIds[(int)(9*Math.random())]);
+            }
+        });
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -148,8 +154,8 @@ public abstract class BaseActivity extends AppCompatActivity
             collapsingToolbarLayout.setTitle(getResources().getString(R.string.nav_header_wallet));
             weatherUtils = new WeatherUtils(this);
             weatherUtils.setNaviChanger(this);
-            weatherUtils.queryWeather("广州");
-
+            weatherUtils.queryWeather("440113");
+            weatherUtils.forecastWeather("440113");
         } else if (id == R.id.nav_setting) {
 
         } else if (id == R.id.nav_about) {
