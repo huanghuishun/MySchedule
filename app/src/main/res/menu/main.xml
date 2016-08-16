@@ -2,15 +2,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
+        android:id="@+id/title_location"
+        android:orderInCategory="70"
+        android:title="广州"
         android:icon="@drawable/location"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always"/>
     <item
         android:icon="@drawable/refresh"
         android:orderInCategory="90"
         android:title="刷新"
         android:id="@+id/title_refresh"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="always"/>
 </menu>

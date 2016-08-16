@@ -17,12 +17,11 @@
             android:id="@+id/collapsinglayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:expandedTitleTextAppearance="@string/nothing"
             app:contentScrim="?attr/colorPrimary"
             app:statusBarScrim="?attr/colorPrimaryDark"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
             >
-            <FrameLayout
+            <RelativeLayout
                 android:id="@+id/naviView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -30,8 +29,7 @@
                 app:layout_collapseMode="parallax"
                 app:layout_collapseParallaxMultiplier="0.7"
                 >
-
-            </FrameLayout>
+            </RelativeLayout>
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"

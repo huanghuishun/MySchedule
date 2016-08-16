@@ -3,6 +3,9 @@ package com.example.huanghuishun.myschedule.utils;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -17,7 +20,7 @@ import com.example.huanghuishun.myschedule.R;
  */
 public class WeatherUtils implements WeatherSearch.OnWeatherSearchListener {
     private Context context;
-    private RelativeLayout weatherNav;
+    private LinearLayout weatherNav;
     private TextView textView;
     private INaviChanger naviChanger;
     private int[] pictureIds = new int[]{R.drawable.cloudy,R.drawable.cloudy2,R.drawable.cloudy3,R.drawable.cloudy4
@@ -49,8 +52,10 @@ public class WeatherUtils implements WeatherSearch.OnWeatherSearchListener {
     }
 
     private void initview() {
-        weatherNav = (RelativeLayout) LayoutInflater.from(context).inflate(R.layout.weathernav, null);
+        weatherNav = (LinearLayout) LayoutInflater.from(context).inflate(R.layout.weathernav,null);
+//        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         textView = (TextView) weatherNav.findViewById(R.id.textView8);
+//        weatherNav.setLayoutParams(lp);
     }
 
 
