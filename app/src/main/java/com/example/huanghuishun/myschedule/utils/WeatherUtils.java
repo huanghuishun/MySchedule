@@ -50,7 +50,7 @@ public class WeatherUtils implements WeatherSearch.OnWeatherSearchListener {
 
     private void initview() {
         weatherNav = (RelativeLayout) LayoutInflater.from(context).inflate(R.layout.weathernav, null);
-        textView = (TextView) weatherNav.findViewById(R.id.textView6);
+        textView = (TextView) weatherNav.findViewById(R.id.textView8);
     }
 
 

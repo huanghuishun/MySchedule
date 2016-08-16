@@ -16,7 +16,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 import com.example.huanghuishun.myschedule.R;
 import com.example.huanghuishun.myschedule.ui.fragment.ScheduleFragment;
@@ -90,6 +93,8 @@ public abstract class BaseActivity extends AppCompatActivity
             }
         });
 
+        setSupportActionBar(toolbar);
+
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
@@ -128,10 +133,29 @@ public abstract class BaseActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        } else if (id == R.id.title_refresh){
+
+            ImageView refreshAction = (ImageView) getLayoutInflater().inflate(R.layout.action,null);
+            refreshAction.setImageResource(R.drawable.refresh);
+            item.setActionView(refreshAction);
+
+            Animation animation = AnimationUtils.loadAnimation(this,R.anim.rotate);
+            refreshAction.startAnimation(animation);
         }
 
         return super.onOptionsItemSelected(item);
     }
+    /*
+        private void hideRefreshAnimation() {
+        if (refreshItem != null) {
+            View view = refreshItem.getActionView();
+            if (view != null) {
+                view.clearAnimation();
+                refreshItem.setActionView(null);
+            }
+        }
+    }
+     */
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override

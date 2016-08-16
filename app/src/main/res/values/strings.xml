@@ -6,6 +6,8 @@
 
     <string name="action_settings">Settings</string>
 
+    <string name="nothing">1</string>
+
     <!--nav_header-->
     <string name="nav_header_schedule">日程</string>
     <string name="nav_header_wallet">账本</string>
