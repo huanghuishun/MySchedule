@@ -22,7 +22,7 @@
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
             >
             <RelativeLayout
-                android:id="@+id/naviView"
+                android:id="@+id/rl_collapsing"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fitsSystemWindows="true"

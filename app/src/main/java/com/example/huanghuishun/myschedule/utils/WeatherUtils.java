@@ -3,10 +3,8 @@ package com.example.huanghuishun.myschedule.utils;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.amap.api.services.weather.LocalWeatherForecastResult;
@@ -20,15 +18,24 @@ import com.example.huanghuishun.myschedule.R;
  */
 public class WeatherUtils implements WeatherSearch.OnWeatherSearchListener {
     private Context context;
-    private LinearLayout weatherNav;
-    private TextView textView;
-    private INaviChanger naviChanger;
-    private int[] pictureIds = new int[]{R.drawable.cloudy,R.drawable.cloudy2,R.drawable.cloudy3,R.drawable.cloudy4
-    ,R.drawable.rainy2,R.drawable.rainy1,R.drawable.snow,R.drawable.sunny,R.drawable.sunny2,R.drawable.sunny3};
+    private LinearLayout weatherCollasping;
+    private TextView tvTempture;
+    private TextView tvWindForce;
+    private TextView tvWindDire;
+    private TextView tvHumidity;
+    private ImageView ivWeather;
+    private ICollapsingChanger collapsingChanger;
+    private int[] weatherSunny = new int[]{R.drawable.snow,R.drawable.sunny,R.drawable.sunny2,R.drawable.sunny3};
+    private int[] weatherCloudy = new int[]{R.drawable.cloudy,R.drawable.cloudy2,R.drawable.cloudy3,R.drawable.cloudy4};
+    private int[] weatherRainy = new int[]{R.drawable.rainy2,R.drawable.rainy1};
 
     public WeatherUtils(Context context) {
         this.context = context;
         initview();
+    }
+
+    public void setCollapsingChanger(ICollapsingChanger collapsingChanger) {
+        this.collapsingChanger = collapsingChanger;
     }
 
     public void queryWeather(String placeName) {
@@ -47,15 +54,15 @@ public class WeatherUtils implements WeatherSearch.OnWeatherSearchListener {
         weatherSearch.searchWeatherAsyn();
     }
 
-    public void setNaviChanger(INaviChanger naviChanger) {
-        this.naviChanger = naviChanger;
-    }
-
     private void initview() {
-        weatherNav = (LinearLayout) LayoutInflater.from(context).inflate(R.layout.weathernav,null);
-//        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        textView = (TextView) weatherNav.findViewById(R.id.textView8);
-//        weatherNav.setLayoutParams(lp);
+        weatherCollasping = (LinearLayout) LayoutInflater.from(context).inflate(R.layout.weathercollapsing,null);
+        tvTempture = (TextView) weatherCollasping.findViewById(R.id.tv_tempture);
+        tvWindForce = (TextView) weatherCollasping.findViewById(R.id.tv_windforce);
+        tvWindDire = (TextView) weatherCollasping.findViewById(R.id.tv_winddire);
+        tvHumidity = (TextView) weatherCollasping.findViewById(R.id.tv_humidity);
+        ivWeather = (ImageView) weatherCollasping.findViewById(R.id.iv_weather);
+
+
     }
 
 
@@ -63,7 +70,10 @@ public class WeatherUtils implements WeatherSearch.OnWeatherSearchListener {
     public void onWeatherLiveSearched(LocalWeatherLiveResult localWeatherLiveResult, int i) {
         if (i == 1000) {
             if (localWeatherLiveResult != null && localWeatherLiveResult.getLiveResult() != null) {
-                textView.setText(localWeatherLiveResult.getLiveResult().getWeather());
+                tvTempture.setText(localWeatherLiveResult.getLiveResult().getTemperature());
+                tvWindForce.setText(localWeatherLiveResult.getLiveResult().getWindPower()+"级");
+                tvWindDire.setText(localWeatherLiveResult.getLiveResult().getWindDirection()+"风");
+                tvHumidity.setText(localWeatherLiveResult.getLiveResult().getHumidity()+"%");
                 Log.d("weather++adcode", localWeatherLiveResult.getLiveResult().getAdCode());
                 Log.d("weather++city", localWeatherLiveResult.getLiveResult().getCity());
                 Log.d("weather++humidity", localWeatherLiveResult.getLiveResult().getHumidity());
@@ -73,8 +83,11 @@ public class WeatherUtils implements WeatherSearch.OnWeatherSearchListener {
                 Log.d("weather++weather", localWeatherLiveResult.getLiveResult().getWeather());
                 Log.d("weather++weatherdirect", localWeatherLiveResult.getLiveResult().getWindDirection());
                 Log.d("weather++winpower", localWeatherLiveResult.getLiveResult().getWindPower());
-                naviChanger.changeNaviView(weatherNav);
+                weatherCollasping.setBackground(context.getDrawable(R.drawable.sunny3));
+                collapsingChanger.changeCollapsingView(weatherCollasping,localWeatherLiveResult.getLiveResult().getCity()+" "+localWeatherLiveResult.getLiveResult().getWeather());
             }
+        } else {
+            collapsingChanger.changeCollapsingView(null,"error");
         }
     }
 

@@ -32,7 +32,7 @@ import com.example.huanghuishun.myschedule.ui.fragment.ScheduleFragment;
 import com.example.huanghuishun.myschedule.ui.fragment.TodayFragment;
 import com.example.huanghuishun.myschedule.ui.fragment.WalletFragment;
 import com.example.huanghuishun.myschedule.ui.fragment.WeatherFragment;
-import com.example.huanghuishun.myschedule.utils.INaviChanger;
+import com.example.huanghuishun.myschedule.utils.ICollapsingChanger;
 import com.example.huanghuishun.myschedule.utils.WeatherUtils;
 
 import java.util.ArrayList;
@@ -43,17 +43,15 @@ import java.util.Objects;
  * Created by huanghuishun on 2016/8/11.
  */
 public abstract class BaseActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,INaviChanger {
+        implements NavigationView.OnNavigationItemSelectedListener, ICollapsingChanger {
 
     private FloatingActionButton fab;
     private Toolbar toolbar;
     private ArrayList<Fragment> fragmentList;
     private static String title;
     private CollapsingToolbarLayout collapsingToolbarLayout;
-    private int[] pictureIds = new int[]{R.drawable.cloudy,R.drawable.cloudy2,R.drawable.cloudy3,R.drawable.cloudy4
-            ,R.drawable.rainy2,R.drawable.rainy1,R.drawable.snow,R.drawable.sunny,R.drawable.sunny2,R.drawable.sunny3};
-    RelativeLayout naviView;
-    WeatherUtils weatherUtils;
+    private MenuItem refreshItem;
+    RelativeLayout collapsingView;
 
     TodayFragment todayFragment = new TodayFragment();
     WeatherFragment weatherFragment = new WeatherFragment();
@@ -73,7 +71,7 @@ public abstract class BaseActivity extends AppCompatActivity
     }
 
     private void initView() {
-        naviView = (RelativeLayout) findViewById(R.id.naviView);
+        collapsingView = (RelativeLayout) findViewById(R.id.rl_collapsing);
         fab = (FloatingActionButton) findViewById(R.id.fab);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsinglayout);
@@ -92,13 +90,6 @@ public abstract class BaseActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
-        naviView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                naviView.setBackgroundResource(pictureIds[(int)(9*Math.random())]);
-            }
-        });
 
         setSupportActionBar(toolbar);
 
@@ -127,14 +118,13 @@ public abstract class BaseActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
-        menu.findItem(R.id.title_location).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS|MenuItem.SHOW_AS_ACTION_WITH_TEXT);
         return true;
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        menu.findItem(R.id.title_location).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS|MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+        refreshItem = menu.findItem(R.id.title_refresh);
         return true;
     }
 
@@ -148,26 +138,47 @@ public abstract class BaseActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.title_location) {
             return true;
-        } else if (id == R.id.title_refresh){
-            View refreshAction = toolbar.findViewById(R.id.title_refresh);
-            item.setActionView(refreshAction);
-            Animation animation = AnimationUtils.loadAnimation(this,R.anim.rotate);
-            refreshAction.startAnimation(animation);
+        } else if (id == R.id.title_refresh) {
+            queryWeather("440113");
         }
-
         return super.onOptionsItemSelected(item);
     }
-    /*
-        private void hideRefreshAnimation() {
+
+    private void startRefreshAnimation() {
+        View refreshAction = toolbar.findViewById(R.id.title_refresh);
+        refreshItem.setActionView(refreshAction);
+        Animation animation = AnimationUtils.loadAnimation(this, R.anim.rotate);
+        refreshAction.startAnimation(animation);
+    }
+
+    private void stopRefreshAnimation(boolean isSuccess) {
+
         if (refreshItem != null) {
             View view = refreshItem.getActionView();
             if (view != null) {
                 view.clearAnimation();
                 refreshItem.setActionView(null);
+                if (isSuccess) {
+                    Snackbar.make(findViewById(R.id.fragmentcontainer), "天气信息已更新。", Snackbar.LENGTH_LONG)
+                            .setAction("好", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+
+                                }
+                            }).show();
+                } else {
+                    Snackbar.make(findViewById(R.id.fragmentcontainer), "更新失败，请检查网络设置。", Snackbar.LENGTH_LONG)
+                            .setAction("好", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+
+                                }
+                            }).show();
+                }
             }
         }
     }
-     */
+
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -177,11 +188,7 @@ public abstract class BaseActivity extends AppCompatActivity
 
         if (id == R.id.nav_today) {
             collapsingToolbarLayout.setTitle("多云");
-
-            weatherUtils = new WeatherUtils(this);
-            weatherUtils.setNaviChanger(this); //设置回调使用的接口
-            weatherUtils.queryWeather("440113");
-            weatherUtils.forecastWeather("440113");
+            queryWeather("440113");
             changeNavi(0);
         } else if (id == R.id.nav_weather) {
             collapsingToolbarLayout.setTitle(getResources().getString(R.string.nav_header_weather));
@@ -210,9 +217,17 @@ public abstract class BaseActivity extends AppCompatActivity
         title = collapsingToolbarLayout.getTitle().toString();
 
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragmentcontainer,fragmentList.get(index))
+                .replace(R.id.fragmentcontainer, fragmentList.get(index))
                 .commit();
 
+    }
+
+    public void queryWeather(String cityCode) {
+        startRefreshAnimation();
+        WeatherUtils weatherUtils = new WeatherUtils(this);
+        weatherUtils.setCollapsingChanger(this); //设置回调使用的接口
+        weatherUtils.queryWeather(cityCode);
+        weatherUtils.forecastWeather(cityCode);
     }
 
     @Override
@@ -228,9 +243,15 @@ public abstract class BaseActivity extends AppCompatActivity
     }
 
     @Override
-    public void changeNaviView(View view) {
-        naviView.removeAllViews();
-        naviView.addView(view,new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+    public void changeCollapsingView(View view, String title) {
+        if (title.equals("error")) {
+            stopRefreshAnimation(false);
+        } else {
+            stopRefreshAnimation(true);
+            collapsingToolbarLayout.setTitle(title);
+            collapsingView.removeAllViews();
+            collapsingView.addView(view, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+        }
     }
 }
 

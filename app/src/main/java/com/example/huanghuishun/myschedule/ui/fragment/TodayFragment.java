@@ -27,4 +27,9 @@ public class TodayFragment extends BaseFragment {
         view = inflater.inflate(R.layout.fragment_today, container, false);
         return view;
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
 }
