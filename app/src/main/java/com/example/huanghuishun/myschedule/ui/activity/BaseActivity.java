@@ -1,5 +1,6 @@
 package com.example.huanghuishun.myschedule.ui.activity;
 
+import android.content.Intent;
 import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
@@ -137,6 +138,9 @@ public abstract class BaseActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.title_location) {
+            Intent intent = new Intent(BaseActivity.this,LocationActivity.class);
+            Log.d("++++++++","+++++++");
+            startActivity(intent);
             return true;
         } else if (id == R.id.title_refresh) {
             queryWeather("440113");
