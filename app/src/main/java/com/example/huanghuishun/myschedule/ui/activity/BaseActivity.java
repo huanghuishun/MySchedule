@@ -143,7 +143,7 @@ public abstract class BaseActivity extends AppCompatActivity
             startActivity(intent);
             return true;
         } else if (id == R.id.title_refresh) {
-            queryWeather("440113");
+            queryWeather("820007");
         }
         return super.onOptionsItemSelected(item);
     }
@@ -191,8 +191,8 @@ public abstract class BaseActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_today) {
-            collapsingToolbarLayout.setTitle("多云");
-            queryWeather("440113");
+            collapsingToolbarLayout.setTitle("今天");
+            queryWeather("140101");
             changeNavi(0);
         } else if (id == R.id.nav_weather) {
             collapsingToolbarLayout.setTitle(getResources().getString(R.string.nav_header_weather));

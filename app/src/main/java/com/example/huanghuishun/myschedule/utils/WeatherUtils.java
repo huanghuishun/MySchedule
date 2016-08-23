@@ -38,8 +38,8 @@ public class WeatherUtils implements WeatherSearch.OnWeatherSearchListener {
         this.collapsingChanger = collapsingChanger;
     }
 
-    public void queryWeather(String placeName) {
-        WeatherSearchQuery query = new WeatherSearchQuery(placeName, WeatherSearchQuery.WEATHER_TYPE_LIVE);
+    public void queryWeather(String adcode) {
+        WeatherSearchQuery query = new WeatherSearchQuery(adcode, WeatherSearchQuery.WEATHER_TYPE_LIVE);
         WeatherSearch weatherSearch = new WeatherSearch(context);
         weatherSearch.setOnWeatherSearchListener(this);
         weatherSearch.setQuery(query);
@@ -61,8 +61,6 @@ public class WeatherUtils implements WeatherSearch.OnWeatherSearchListener {
         tvWindDire = (TextView) weatherCollasping.findViewById(R.id.tv_winddire);
         tvHumidity = (TextView) weatherCollasping.findViewById(R.id.tv_humidity);
         ivWeather = (ImageView) weatherCollasping.findViewById(R.id.iv_weather);
-
-
     }
 
 
