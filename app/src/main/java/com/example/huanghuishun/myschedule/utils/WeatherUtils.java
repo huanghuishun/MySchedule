@@ -49,7 +49,7 @@ public class WeatherUtils implements WeatherSearch.OnWeatherSearchListener {
         for (City city : cities) {
             final Weather weather = new Weather();
             weather.setCity(city);
-            WeatherSearchQuery query = new WeatherSearchQuery("370500", WeatherSearchQuery.WEATHER_TYPE_LIVE);
+            WeatherSearchQuery query = new WeatherSearchQuery(""+city.getAdCode(), WeatherSearchQuery.WEATHER_TYPE_LIVE);
             WeatherSearch weatherSearch = new WeatherSearch(context);
             weatherSearch.setOnWeatherSearchListener(new WeatherSearch.OnWeatherSearchListener() {
                 @Override
@@ -63,7 +63,7 @@ public class WeatherUtils implements WeatherSearch.OnWeatherSearchListener {
                             //  Log.d("weather++humidity", localWeatherLiveResult.getLiveResult().getHumidity());
                             weatherList.add(weather);
                             if (weatherList.size() == cities.size()){
-                                listener.sendData(weatherList);
+                                listener.getData(weatherList);
                             }
                         }
                     }

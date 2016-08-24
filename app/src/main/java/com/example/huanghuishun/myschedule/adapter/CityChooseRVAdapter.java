@@ -35,18 +35,11 @@ public class CityChooseRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     public HashMap<String, Integer> alphaIndex;
 
-    final private static int ITEM_MINE = 1;
-    final private static int ITEM_LOCATION = 2;
-    final private static int ITEM_ALL = 3;
+    final public static int ITEM_MINE = 1;
+    final public static int ITEM_LOCATION = 2;
+    final public static int ITEM_ALL = 3;
 
     private String[] backgroundColors = new String[]{"#e8854c","#d4584e","#5b7262","#29555e"};
-
-    /*
-232 133 76,e8854c
-212 88 78,d4584e
-91 114 98,5b7262
-41 85 94,29555e
- */
 
     public CityChooseRVAdapter(Context context, List<Weather> weatherList, City location, List<City> cityList) {
         this.context = context;

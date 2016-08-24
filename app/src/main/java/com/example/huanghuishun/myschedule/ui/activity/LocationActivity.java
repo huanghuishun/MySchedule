@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.os.Bundle;
@@ -31,6 +32,8 @@ import com.example.huanghuishun.myschedule.entity.City;
 import com.example.huanghuishun.myschedule.entity.Weather;
 import com.example.huanghuishun.myschedule.sqlite.AllCitiesDatabaseHelper;
 import com.example.huanghuishun.myschedule.sqlite.MyCitiesDatabaseHelper;
+import com.example.huanghuishun.myschedule.utils.WeatherUtils;
+import com.example.huanghuishun.myschedule.utils.onDataLoadCompletedListener;
 import com.example.huanghuishun.myschedule.widget.MyLetterView;
 import com.github.promeg.pinyinhelper.Pinyin;
 
@@ -72,10 +75,9 @@ public class LocationActivity extends BaseActivityWithToolbar {
         showProgress(true);
         initData();
         setListener();
-        Log.d("111111111","111111");
-     //   insertMyCity();
+        Log.d("111111111", "111111");
+        insertMyCity();
         initWeatherListData();
-        //  initCityList();
         handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
@@ -139,7 +141,29 @@ public class LocationActivity extends BaseActivityWithToolbar {
         recyclerView.addOnItemTouchListener(new OnRecyclerItemClickListener(recyclerView) {
             @Override
             public void onItemClick(RecyclerView.ViewHolder holder) {
-                Toast.makeText(LocationActivity.this,"hihi",Toast.LENGTH_LONG).show();
+                switch (holder.getItemViewType()){
+                    case CityChooseRVAdapter.ITEM_MINE:
+                        break;
+                    case CityChooseRVAdapter.ITEM_LOCATION:
+                        break;
+                    case CityChooseRVAdapter.ITEM_ALL:
+                        int realPosition = holder.getLayoutPosition()-weatherList.size()-1;
+                        final City city = cityList.get(realPosition);
+                        SQLiteDatabase db = citiesDatabaseHelper.getReadableDatabase();
+                        db.execSQL("insert or ignore into city(name,adcode) values ('"+city.getName()+"',"+city.getAdCode()+")");
+                        db.close();
+                        Snackbar.make(findViewById(R.id.location_root),"已经添加到“我的城市”。",Snackbar.LENGTH_LONG)
+                                .setAction("删除", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        SQLiteDatabase db = citiesDatabaseHelper.getReadableDatabase();
+                                        db.execSQL("delete from city where adcode ="+city.getAdCode());
+                                        db.close();
+                                    }
+                                }).show();
+                        break;
+                }
+
             }
         });
 
@@ -170,21 +194,32 @@ public class LocationActivity extends BaseActivityWithToolbar {
     }
 
     public void initWeatherListData() {
+        WeatherUtils weatherUtils = new WeatherUtils(LocationActivity.this);
+        List<City> queryCities = new ArrayList<>();
         SQLiteDatabase db = citiesDatabaseHelper.getWritableDatabase();
         Cursor cursor = db.rawQuery("select * from city", null);
         while (cursor.moveToNext()) {
-            Weather weather = new Weather();
-            weather.setDayTemp("20");
-            weather.setDayWeather("晴转多云");
             City city = new City();
             String name = cursor.getString(cursor.getColumnIndex("name"));
             city.setName(name);
             city.setAdCode(cursor.getInt(cursor.getColumnIndex("adcode")));
-            weather.setCity(city);
-            weatherList.add(weather);
+            queryCities.add(city);
         }
         cursor.close();
         db.close();
+        weatherUtils.queryWeather(queryCities, new onDataLoadCompletedListener() {
+            @Override
+            public void getData(List list) {
+                weatherList.clear();
+                weatherList.addAll(list);
+                for (Weather weather : weatherList) {
+                    Log.d("weatherlist", weather.getDayTemp());
+                    Log.d("weatherlist", weather.getDayWeather());
+                }
+                Log.d("weatherlistttttt", weatherList.toString());
+                cityChooseRVAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     public void initCityList() {
@@ -317,9 +352,9 @@ public class LocationActivity extends BaseActivityWithToolbar {
 
     public void insertMyCity() {
         SQLiteDatabase db = citiesDatabaseHelper.getReadableDatabase();
-        db.execSQL("insert into city(name,adcode) values ('北京',110000)");
-        db.execSQL("insert into city(name,adcode) values ('上海',310000)");
-        db.execSQL("insert into city(name,adcode) values ('广州',440100)");
+        db.execSQL("insert or ignore into city(name,adcode) values ('北京',110000)");
+        db.execSQL("insert or ignore into city(name,adcode) values ('上海',310000)");
+        db.execSQL("insert or ignore into city(name,adcode) values ('广州',440100)");
         db.close();
     }
 

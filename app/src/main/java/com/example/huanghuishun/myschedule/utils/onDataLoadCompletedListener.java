@@ -6,5 +6,5 @@ import java.util.List;
  * Created by huanghuishun on 2016/8/24.
  */
 public interface onDataLoadCompletedListener {
-    void sendData(List list);
+    void getData(List list);
 }

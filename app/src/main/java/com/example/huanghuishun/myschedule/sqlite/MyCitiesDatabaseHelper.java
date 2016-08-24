@@ -12,8 +12,9 @@ public class MyCitiesDatabaseHelper extends SQLiteOpenHelper {
     final private static String CREATE_CITY = "CREATE TABLE IF NOT EXISTS city (" +
             "id integer primary key autoincrement," +
             "name text," +
-            "adcode integer," +
-            "location text)";
+            "adcode integer unique," +
+            "location text," +
+            "isprimary integer)";
 
     public MyCitiesDatabaseHelper(Context context) {
         super(context, "city", null, 1);
