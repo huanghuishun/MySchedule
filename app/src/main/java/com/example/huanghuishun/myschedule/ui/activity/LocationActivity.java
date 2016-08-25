@@ -61,7 +61,6 @@ public class LocationActivity extends BaseActivityWithToolbar {
     private List<City> searchResultList;
 
     public MyCitiesDatabaseHelper citiesDatabaseHelper;
-    public SQLiteDatabase database;
 
     public CityChooseRVAdapter cityChooseRVAdapter;
     private Handler handler;
@@ -121,7 +120,6 @@ public class LocationActivity extends BaseActivityWithToolbar {
         cityList = new ArrayList<>();
         searchResultList = new ArrayList<>();
         citiesDatabaseHelper = new MyCitiesDatabaseHelper(this);
-        database = citiesDatabaseHelper.getWritableDatabase();
 
     }
 

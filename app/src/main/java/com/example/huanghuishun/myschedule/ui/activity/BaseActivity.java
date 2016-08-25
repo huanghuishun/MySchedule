@@ -1,6 +1,8 @@
 package com.example.huanghuishun.myschedule.ui.activity;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
@@ -18,6 +20,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,17 +30,23 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.example.huanghuishun.myschedule.R;
 import com.example.huanghuishun.myschedule.entity.City;
+import com.example.huanghuishun.myschedule.entity.Weather;
+import com.example.huanghuishun.myschedule.sqlite.MyCitiesDatabaseHelper;
 import com.example.huanghuishun.myschedule.ui.fragment.ScheduleFragment;
 import com.example.huanghuishun.myschedule.ui.fragment.TodayFragment;
 import com.example.huanghuishun.myschedule.ui.fragment.WalletFragment;
 import com.example.huanghuishun.myschedule.ui.fragment.WeatherFragment;
+import com.example.huanghuishun.myschedule.utils.CollapsingUtils;
 import com.example.huanghuishun.myschedule.utils.ICollapsingChanger;
 import com.example.huanghuishun.myschedule.utils.WeatherUtils;
+import com.example.huanghuishun.myschedule.utils.onDataLoadCompletedListener;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -45,7 +54,7 @@ import java.util.Objects;
  * Created by huanghuishun on 2016/8/11.
  */
 public abstract class BaseActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, ICollapsingChanger {
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     private FloatingActionButton fab;
     private Toolbar toolbar;
@@ -54,7 +63,10 @@ public abstract class BaseActivity extends AppCompatActivity
     private CollapsingToolbarLayout collapsingToolbarLayout;
     private MenuItem refreshItem;
     private City primaryCity;
-    RelativeLayout collapsingView;
+    private LinearLayout weatherCollasping;
+    private RelativeLayout collapsingView;
+
+    public MyCitiesDatabaseHelper citiesDatabaseHelper;
 
     TodayFragment todayFragment = new TodayFragment();
     WeatherFragment weatherFragment = new WeatherFragment();
@@ -73,9 +85,11 @@ public abstract class BaseActivity extends AppCompatActivity
     public void setContentView(@LayoutRes int layoutResID) {
         super.setContentView(layoutResID);
         initView();
+        initData();
     }
 
     private void initView() {
+        weatherCollasping = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.weathercollapsing, null);
         collapsingView = (RelativeLayout) findViewById(R.id.rl_collapsing);
         fab = (FloatingActionButton) findViewById(R.id.fab);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -107,6 +121,12 @@ public abstract class BaseActivity extends AppCompatActivity
         fragmentList.add(scheduleFragment);
         fragmentList.add(walletFragment);
         changeNavi(0);
+
+
+    }
+
+    private void initData(){
+        citiesDatabaseHelper = new MyCitiesDatabaseHelper(this);
     }
 
     @Override
@@ -147,19 +167,17 @@ public abstract class BaseActivity extends AppCompatActivity
             startActivity(intent);
             return true;
         } else if (id == R.id.title_refresh) {
-            queryWeather("820007");
+            queryWeather();
         }
         return super.onOptionsItemSelected(item);
     }
-    public void getPrimaryCity(){
-
-    }
-
     private void startRefreshAnimation() {
         View refreshAction = toolbar.findViewById(R.id.title_refresh);
-        refreshItem.setActionView(refreshAction);
-        Animation animation = AnimationUtils.loadAnimation(this, R.anim.rotate);
-        refreshAction.startAnimation(animation);
+        if (refreshAction != null){
+            refreshItem.setActionView(refreshAction);
+            Animation animation = AnimationUtils.loadAnimation(this, R.anim.rotate);
+            refreshAction.startAnimation(animation);
+        }
     }
 
     private void stopRefreshAnimation(boolean isSuccess) {
@@ -199,11 +217,10 @@ public abstract class BaseActivity extends AppCompatActivity
 
         if (id == R.id.nav_today) {
             collapsingToolbarLayout.setTitle("今天");
-            queryWeather("140101");
+            queryWeather();
             changeNavi(0);
         } else if (id == R.id.nav_weather) {
             collapsingToolbarLayout.setTitle(getResources().getString(R.string.nav_header_weather));
-
             changeNavi(1);
         } else if (id == R.id.nav_schedule) {
             collapsingToolbarLayout.setTitle(getResources().getString(R.string.nav_header_schedule));
@@ -233,18 +250,35 @@ public abstract class BaseActivity extends AppCompatActivity
 
     }
 
-    public void queryWeather(String cityCode) {
+    public void queryWeather() {
         startRefreshAnimation();
-        WeatherUtils weatherUtils = new WeatherUtils(this);
-        weatherUtils.setCollapsingChanger(this); //设置回调使用的接口
-        weatherUtils.queryWeather(cityCode);
-        weatherUtils.forecastWeather(cityCode);
+        List<City> list = new ArrayList<>();
+        final WeatherUtils weatherUtils = new WeatherUtils(this);
+        SQLiteDatabase db = citiesDatabaseHelper.getWritableDatabase();
+        Cursor cursor = db.rawQuery("select * from city where isprimary = 1",null);
+        while (cursor.moveToNext()){
+            City city = new City();
+            city.setName(cursor.getString(cursor.getColumnIndex("name")));
+            city.setAdCode(cursor.getInt(cursor.getColumnIndex("adcode")));
+            list.add(city);
+            weatherUtils.queryWeather(list, new onDataLoadCompletedListener() {
+                @Override
+                public void getData(List list) {
+                    CollapsingUtils collapsingUtils = new CollapsingUtils(BaseActivity.this);
+                    View view = collapsingUtils.getWeatherCollapsingView((Weather) list.get(0));
+                    String collapsingTitle = ((Weather) list.get(0)).getCity().getName() + "  "
+                            +((Weather) list.get(0)).getDayWeather();
+                    changeCollapsingView(view,collapsingTitle);
+                }
+            });
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         collapsingToolbarLayout.setTitle(title);
+        queryWeather();
     }
 
     @Override
@@ -253,16 +287,11 @@ public abstract class BaseActivity extends AppCompatActivity
         title = collapsingToolbarLayout.getTitle().toString();
     }
 
-    @Override
-    public void changeCollapsingView(View view, String title) {
-        if (title.equals("error")) {
-            stopRefreshAnimation(false);
-        } else {
+    public void changeCollapsingView(View view,String coallpsingTitle) {
             stopRefreshAnimation(true);
-            collapsingToolbarLayout.setTitle(title);
+            collapsingToolbarLayout.setTitle(coallpsingTitle);
             collapsingView.removeAllViews();
             collapsingView.addView(view, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-        }
     }
 }
 

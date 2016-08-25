@@ -16,6 +16,7 @@ public class Weather {
     private String nightWeather;  //夜间天气
     private String nightWindDirection;  //夜间风向
     private String nightWindPower;  //夜间风力
+    private String humidity;//湿度
 
     public String getNightWindPower() {
         return nightWindPower;
@@ -95,5 +96,13 @@ public class Weather {
 
     public void setCity(City city) {
         this.city = city;
+    }
+
+    public String getHumidity() {
+        return humidity;
+    }
+
+    public void setHumidity(String humidity) {
+        this.humidity = humidity;
     }
 }
