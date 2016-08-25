@@ -17,6 +17,7 @@ public class City {
     private int adCode;
     private int cityCode;
     private String location;
+    private boolean isPrimary;
 
     public int getAdCode() {
         return adCode;
@@ -56,5 +57,13 @@ public class City {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean isPrimary() {
+        return isPrimary;
+    }
+
+    public void setPrimary(boolean primary) {
+        isPrimary = primary;
     }
 }

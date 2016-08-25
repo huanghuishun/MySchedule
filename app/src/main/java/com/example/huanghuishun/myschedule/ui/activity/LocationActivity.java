@@ -75,7 +75,6 @@ public class LocationActivity extends BaseActivityWithToolbar {
         showProgress(true);
         initData();
         setListener();
-        Log.d("111111111", "111111");
         insertMyCity();
         initWeatherListData();
         handler = new Handler() {
@@ -141,17 +140,20 @@ public class LocationActivity extends BaseActivityWithToolbar {
         recyclerView.addOnItemTouchListener(new OnRecyclerItemClickListener(recyclerView) {
             @Override
             public void onItemClick(RecyclerView.ViewHolder holder) {
+                SQLiteDatabase db = citiesDatabaseHelper.getReadableDatabase();
                 switch (holder.getItemViewType()){
                     case CityChooseRVAdapter.ITEM_MINE:
+                        int position = holder.getLayoutPosition();
+                        Weather weather = weatherList.get(position);
+                        db.execSQL("update city set isprimary = 0");
+                        db.execSQL("update city set isprimary = 1 where adcode ="+weather.getCity().getAdCode());
                         break;
                     case CityChooseRVAdapter.ITEM_LOCATION:
                         break;
                     case CityChooseRVAdapter.ITEM_ALL:
                         int realPosition = holder.getLayoutPosition()-weatherList.size()-1;
                         final City city = cityList.get(realPosition);
-                        SQLiteDatabase db = citiesDatabaseHelper.getReadableDatabase();
                         db.execSQL("insert or ignore into city(name,adcode) values ('"+city.getName()+"',"+city.getAdCode()+")");
-                        db.close();
                         Snackbar.make(findViewById(R.id.location_root),"已经添加到“我的城市”。",Snackbar.LENGTH_LONG)
                                 .setAction("删除", new View.OnClickListener() {
                                     @Override
@@ -163,6 +165,7 @@ public class LocationActivity extends BaseActivityWithToolbar {
                                 }).show();
                         break;
                 }
+                db.close();
 
             }
         });
@@ -200,9 +203,9 @@ public class LocationActivity extends BaseActivityWithToolbar {
         Cursor cursor = db.rawQuery("select * from city", null);
         while (cursor.moveToNext()) {
             City city = new City();
-            String name = cursor.getString(cursor.getColumnIndex("name"));
-            city.setName(name);
+            city.setName(cursor.getString(cursor.getColumnIndex("name")));
             city.setAdCode(cursor.getInt(cursor.getColumnIndex("adcode")));
+            city.setPrimary(cursor.getInt(cursor.getColumnIndex("isprimary")) == 1);
             queryCities.add(city);
         }
         cursor.close();

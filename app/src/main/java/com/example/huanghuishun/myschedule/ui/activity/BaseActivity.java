@@ -29,6 +29,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.example.huanghuishun.myschedule.R;
+import com.example.huanghuishun.myschedule.entity.City;
 import com.example.huanghuishun.myschedule.ui.fragment.ScheduleFragment;
 import com.example.huanghuishun.myschedule.ui.fragment.TodayFragment;
 import com.example.huanghuishun.myschedule.ui.fragment.WalletFragment;
@@ -52,12 +53,15 @@ public abstract class BaseActivity extends AppCompatActivity
     private static String title;
     private CollapsingToolbarLayout collapsingToolbarLayout;
     private MenuItem refreshItem;
+    private City primaryCity;
     RelativeLayout collapsingView;
 
     TodayFragment todayFragment = new TodayFragment();
     WeatherFragment weatherFragment = new WeatherFragment();
     ScheduleFragment scheduleFragment = new ScheduleFragment();
     WalletFragment walletFragment = new WalletFragment();
+
+
 
 
     @Override
@@ -146,6 +150,9 @@ public abstract class BaseActivity extends AppCompatActivity
             queryWeather("820007");
         }
         return super.onOptionsItemSelected(item);
+    }
+    public void getPrimaryCity(){
+
     }
 
     private void startRefreshAnimation() {

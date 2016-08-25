@@ -14,7 +14,7 @@ public class MyCitiesDatabaseHelper extends SQLiteOpenHelper {
             "name text," +
             "adcode integer unique," +
             "location text," +
-            "isprimary integer)";
+            "isprimary integer default 0)";
 
     public MyCitiesDatabaseHelper(Context context) {
         super(context, "city", null, 1);

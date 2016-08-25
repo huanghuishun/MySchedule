@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.huanghuishun.myschedule.R;
@@ -87,6 +88,11 @@ public class CityChooseRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             ((MineViewHolder) holder).tv_place.setText(weatherList.get(position).getCity().getName());
             ((MineViewHolder) holder).itemView.setBackgroundColor(Color.parseColor(backgroundColors[position%4]));
             ((MineViewHolder) holder).itemView.setClickable(true);
+            if (weatherList.get(position).getCity().isPrimary()){
+                ((MineViewHolder) holder).iv_star.setVisibility(View.VISIBLE);
+            } else {
+                ((MineViewHolder) holder).iv_star.setVisibility(View.GONE);
+            }
         } else if (holder instanceof LocationViewHolder) {
             ((LocationViewHolder) holder).tv_place.setText(location.getName());
             ((LocationViewHolder) holder).itemView.setClickable(true);
@@ -116,12 +122,14 @@ public class CityChooseRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         TextView tv_place;
         TextView tv_weather;
         TextView tv_temp;
+        ImageView iv_star;
 
         public MineViewHolder(View itemView) {
             super(itemView);
             tv_place = (TextView) itemView.findViewById(R.id.item1_tv_place);
             tv_weather = (TextView) itemView.findViewById(R.id.item1_tv_weather);
             tv_temp = (TextView) itemView.findViewById(R.id.item1_tv_temp);
+            iv_star = (ImageView) itemView.findViewById(R.id.item1_iv_star);
         }
     }
 
