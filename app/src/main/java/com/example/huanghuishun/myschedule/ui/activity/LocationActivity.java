@@ -48,6 +48,7 @@ import java.util.List;
 public class LocationActivity extends BaseActivityWithToolbar {
 
     final private static int CLOSE_DIALOG = 0;
+    final private static int REFRESH_RECYCLERVIEW = 1;
 
     private MyLetterView myLetterView;
     private TextView tvDialog;
@@ -83,6 +84,9 @@ public class LocationActivity extends BaseActivityWithToolbar {
                     case CLOSE_DIALOG:
                         showProgress(false);
                         setAdapter();
+                        break;
+                    case REFRESH_RECYCLERVIEW:
+                        cityChooseRVAdapter.notifyDataSetChanged();
                         break;
                 }
             }
@@ -139,30 +143,50 @@ public class LocationActivity extends BaseActivityWithToolbar {
             @Override
             public void onItemClick(RecyclerView.ViewHolder holder) {
                 SQLiteDatabase db = citiesDatabaseHelper.getReadableDatabase();
-                switch (holder.getItemViewType()){
+                switch (holder.getItemViewType()) {
                     case CityChooseRVAdapter.ITEM_MINE:
                         int position = holder.getLayoutPosition();
                         Weather weather = weatherList.get(position);
                         db.execSQL("update city set isprimary = 0");
-                        db.execSQL("update city set isprimary = 1 where adcode ="+weather.getCity().getAdCode());
+                        db.execSQL("update city set isprimary = 1 where adcode =" + weather.getCity().getAdCode());
+                        Snackbar.make(findViewById(R.id.location_root),"已将 "+weather.getCity().getName()+" 设为主要城市。",Snackbar.LENGTH_LONG)
+                                .setAction("好", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+
+                                    }
+                                }).show();
                         break;
                     case CityChooseRVAdapter.ITEM_LOCATION:
                         break;
                     case CityChooseRVAdapter.ITEM_ALL:
-                        int realPosition = holder.getLayoutPosition()-weatherList.size()-1;
+                        final int realPosition = holder.getLayoutPosition() - weatherList.size() - 1;
                         final City city = cityList.get(realPosition);
-                        db.execSQL("insert or ignore into city(name,adcode) values ('"+city.getName()+"',"+city.getAdCode()+")");
-                        Snackbar.make(findViewById(R.id.location_root),"已经添加到“我的城市”。",Snackbar.LENGTH_LONG)
+                        db.execSQL("insert or ignore into city(name,adcode) values ('" + city.getName() + "'," + city.getAdCode() + ")");
+                        Snackbar.make(findViewById(R.id.location_root), "已经添加到“我的城市”。", Snackbar.LENGTH_LONG)
                                 .setAction("删除", new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
                                         SQLiteDatabase db = citiesDatabaseHelper.getReadableDatabase();
-                                        db.execSQL("delete from city where adcode ="+city.getAdCode());
+                                        db.execSQL("delete from city where adcode =" + city.getAdCode());
                                         db.close();
+                                        initWeatherListData();
+                                        cityChooseRVAdapter.notifyDataSetChanged();
                                     }
                                 }).show();
                         break;
                 }
+//                Thread thread = new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        Message message = new Message();
+//                        message.what = REFRESH_RECYCLERVIEW;
+//                        handler.sendMessage(message);
+//                    }
+//                });
+//                thread.start();
+                initWeatherListData();
+                setAdapter();
                 db.close();
 
             }
@@ -204,6 +228,9 @@ public class LocationActivity extends BaseActivityWithToolbar {
             city.setName(cursor.getString(cursor.getColumnIndex("name")));
             city.setAdCode(cursor.getInt(cursor.getColumnIndex("adcode")));
             city.setPrimary(cursor.getInt(cursor.getColumnIndex("isprimary")) == 1);
+            city.setId(cursor.getInt(cursor.getColumnIndex("id")));
+            Log.d("idddddd", "" + city.getId());
+            Log.d("idddddddddd", "" + cursor.getInt(cursor.getColumnIndex("id")));
             queryCities.add(city);
         }
         cursor.close();
@@ -213,11 +240,19 @@ public class LocationActivity extends BaseActivityWithToolbar {
             public void getData(List list) {
                 weatherList.clear();
                 weatherList.addAll(list);
-                for (Weather weather : weatherList) {
-                    Log.d("weatherlist", weather.getDayTemp());
-                    Log.d("weatherlist", weather.getDayWeather());
-                }
-                Log.d("weatherlistttttt", weatherList.toString());
+                Collections.sort(weatherList,new Comparator<Weather>() {
+                    @Override
+                    public int compare(Weather weather, Weather t1) {
+                        if (weather.getCity().getId() > t1.getCity().getId()) {
+                            return 1;
+                        } else if (weather.getCity().getId() < t1.getCity().getId()) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                Log.d("sortttttttt",weatherList.toString());
                 cityChooseRVAdapter.notifyDataSetChanged();
             }
         });

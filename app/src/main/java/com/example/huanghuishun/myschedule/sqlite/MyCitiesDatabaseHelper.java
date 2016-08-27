@@ -14,7 +14,8 @@ public class MyCitiesDatabaseHelper extends SQLiteOpenHelper {
             "name text," +
             "adcode integer unique," +
             "location text," +
-            "isprimary integer default 0)";
+            "isprimary integer default 0,"+
+            "inserteddate timestamp default (datetime('now','localtime')))";
 
     public MyCitiesDatabaseHelper(Context context) {
         super(context, "city", null, 1);
