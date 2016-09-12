@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
@@ -13,6 +14,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -149,7 +151,7 @@ public class LocationActivity extends BaseActivityWithToolbar {
                         Weather weather = weatherList.get(position);
                         db.execSQL("update city set isprimary = 0");
                         db.execSQL("update city set isprimary = 1 where adcode =" + weather.getCity().getAdCode());
-                        Snackbar.make(findViewById(R.id.location_root),"已将 "+weather.getCity().getName()+" 设为主要城市。",Snackbar.LENGTH_LONG)
+                        Snackbar.make(findViewById(R.id.location_root), "已将 " + weather.getCity().getName() + " 设为主要城市。", Snackbar.LENGTH_LONG)
                                 .setAction("好", new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
@@ -189,6 +191,47 @@ public class LocationActivity extends BaseActivityWithToolbar {
                 setAdapter();
                 db.close();
 
+            }
+
+            @Override
+            public void onLongClick(RecyclerView.ViewHolder holder) {
+                SQLiteDatabase db = citiesDatabaseHelper.getReadableDatabase();
+                int position = holder.getLayoutPosition();
+                final Weather weather = weatherList.get(position);
+                switch (holder.getItemViewType()) {
+                    case CityChooseRVAdapter.ITEM_MINE:
+                        AlertDialog.Builder builder = new AlertDialog.Builder(LocationActivity.this)
+                                .setTitle("是否删除？")
+                                .setPositiveButton("是", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        SQLiteDatabase db = citiesDatabaseHelper.getReadableDatabase();
+                                        db.execSQL("delete from city where adcode =" + weather.getCity().getAdCode());
+                                        db.close();
+                                        initWeatherListData();
+                                        cityChooseRVAdapter.notifyDataSetChanged();
+                                        Snackbar.make(findViewById(R.id.location_root), "删除成功！", Snackbar.LENGTH_LONG)
+                                                .setAction("好", new View.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(View view) {
+
+                                                    }
+                                                }).show();
+                                    }
+                                })
+                                .setNegativeButton("否", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                                    }
+                                });
+                        builder.create().show();
+                        break;
+                    case CityChooseRVAdapter.ITEM_LOCATION:
+                        break;
+                    case CityChooseRVAdapter.ITEM_ALL:
+                        break;
+                }
             }
         });
 
@@ -240,7 +283,7 @@ public class LocationActivity extends BaseActivityWithToolbar {
             public void getData(List list) {
                 weatherList.clear();
                 weatherList.addAll(list);
-                Collections.sort(weatherList,new Comparator<Weather>() {
+                Collections.sort(weatherList, new Comparator<Weather>() {
                     @Override
                     public int compare(Weather weather, Weather t1) {
                         if (weather.getCity().getId() > t1.getCity().getId()) {
@@ -252,7 +295,7 @@ public class LocationActivity extends BaseActivityWithToolbar {
                         }
                     }
                 });
-                Log.d("sortttttttt",weatherList.toString());
+                Log.d("sortttttttt", weatherList.toString());
                 cityChooseRVAdapter.notifyDataSetChanged();
             }
         });

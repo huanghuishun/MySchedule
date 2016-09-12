@@ -256,22 +256,28 @@ public abstract class BaseActivity extends AppCompatActivity
         final WeatherUtils weatherUtils = new WeatherUtils(this);
         SQLiteDatabase db = citiesDatabaseHelper.getWritableDatabase();
         Cursor cursor = db.rawQuery("select * from city where isprimary = 1",null);
-        while (cursor.moveToNext()){
-            City city = new City();
-            city.setName(cursor.getString(cursor.getColumnIndex("name")));
-            city.setAdCode(cursor.getInt(cursor.getColumnIndex("adcode")));
-            list.add(city);
-            weatherUtils.queryWeather(list, new onDataLoadCompletedListener() {
-                @Override
-                public void getData(List list) {
-                    CollapsingUtils collapsingUtils = new CollapsingUtils(BaseActivity.this);
-                    View view = collapsingUtils.getWeatherCollapsingView((Weather) list.get(0));
-                    String collapsingTitle = ((Weather) list.get(0)).getCity().getName() + "  "
-                            +((Weather) list.get(0)).getDayWeather();
-                    changeCollapsingView(view,collapsingTitle);
-                }
-            });
+        if (cursor != null){
+            while (cursor.moveToNext()){
+                City city = new City();
+                city.setName(cursor.getString(cursor.getColumnIndex("name")));
+                city.setAdCode(cursor.getInt(cursor.getColumnIndex("adcode")));
+                list.add(city);
+                weatherUtils.queryWeather(list, new onDataLoadCompletedListener() {
+                    @Override
+                    public void getData(List list) {
+                        CollapsingUtils collapsingUtils = new CollapsingUtils(BaseActivity.this);
+                        View view = collapsingUtils.getWeatherCollapsingView((Weather) list.get(0));
+                        String collapsingTitle = ((Weather) list.get(0)).getCity().getName() + "  "
+                                +((Weather) list.get(0)).getDayWeather();
+                        changeCollapsingView(view,collapsingTitle);
+                    }
+                });
+            }
+        } else {
+            String collapsingTitle = "请先设置主要城市";
+            changeCollapsingView(new LinearLayout(BaseActivity.this),collapsingTitle);
         }
+
     }
 
     @Override
