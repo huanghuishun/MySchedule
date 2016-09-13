@@ -256,7 +256,7 @@ public abstract class BaseActivity extends AppCompatActivity
         final WeatherUtils weatherUtils = new WeatherUtils(this);
         SQLiteDatabase db = citiesDatabaseHelper.getWritableDatabase();
         Cursor cursor = db.rawQuery("select * from city where isprimary = 1",null);
-        if (cursor != null){
+        if (cursor.getCount() != 0){
             while (cursor.moveToNext()){
                 City city = new City();
                 city.setName(cursor.getString(cursor.getColumnIndex("name")));

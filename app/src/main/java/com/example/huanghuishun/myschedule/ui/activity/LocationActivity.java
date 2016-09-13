@@ -3,7 +3,6 @@ package com.example.huanghuishun.myschedule.ui.activity;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -11,7 +10,6 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -24,7 +22,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.huanghuishun.myschedule.R;
 import com.example.huanghuishun.myschedule.adapter.CityChooseRVAdapter;
@@ -41,7 +38,6 @@ import com.github.promeg.pinyinhelper.Pinyin;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -57,6 +53,7 @@ public class LocationActivity extends BaseActivityWithToolbar {
     private RecyclerView recyclerView;
     private View mProgressView;
     private RelativeLayout progress;
+    private MenuItem searchItem;
 
     private List<Weather> weatherList;
     private City location;
@@ -77,7 +74,6 @@ public class LocationActivity extends BaseActivityWithToolbar {
         showProgress(true);
         initData();
         setListener();
-        insertMyCity();
         initWeatherListData();
         handler = new Handler() {
             @Override
@@ -104,7 +100,6 @@ public class LocationActivity extends BaseActivityWithToolbar {
             }
         });
         thread.start();
-
     }
 
     public void initView() {
@@ -171,6 +166,22 @@ public class LocationActivity extends BaseActivityWithToolbar {
                                     public void onClick(View view) {
                                         SQLiteDatabase db = citiesDatabaseHelper.getReadableDatabase();
                                         db.execSQL("delete from city where adcode =" + city.getAdCode());
+                                        db.close();
+                                        initWeatherListData();
+                                        cityChooseRVAdapter.notifyDataSetChanged();
+                                    }
+                                }).show();
+                        break;
+                    default:
+                        final City city1 = searchResultList.get(holder.getLayoutPosition());
+                        db.execSQL("insert or ignore into city(name,adcode) values ('" + city1.getName() + "'," + city1.getAdCode() + ")");
+                        searchItem.collapseActionView(); //折叠searchView
+                        Snackbar.make(findViewById(R.id.location_root), "已经添加到“我的城市”。", Snackbar.LENGTH_LONG)
+                                .setAction("删除", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        SQLiteDatabase db = citiesDatabaseHelper.getReadableDatabase();
+                                        db.execSQL("delete from city where adcode =" + city1.getAdCode());
                                         db.close();
                                         initWeatherListData();
                                         cityChooseRVAdapter.notifyDataSetChanged();
@@ -364,7 +375,7 @@ public class LocationActivity extends BaseActivityWithToolbar {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.location, menu);
-        MenuItem searchItem = menu.findItem(R.id.action_search);
+        searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -428,13 +439,4 @@ public class LocationActivity extends BaseActivityWithToolbar {
         }
         return buffer.toString();
     }
-
-    public void insertMyCity() {
-        SQLiteDatabase db = citiesDatabaseHelper.getReadableDatabase();
-        db.execSQL("insert or ignore into city(name,adcode) values ('北京',110000)");
-        db.execSQL("insert or ignore into city(name,adcode) values ('上海',310000)");
-        db.execSQL("insert or ignore into city(name,adcode) values ('广州',440100)");
-        db.close();
-    }
-
 }
