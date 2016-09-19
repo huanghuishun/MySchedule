@@ -20,7 +20,7 @@ import com.example.huanghuishun.myschedule.R;
 /**
  * Created by huanghuishun on 2016/8/17.
  */
-public class BaseActivityWithToolbar extends AppCompatActivity {
+public abstract class BaseActivityWithToolbar extends AppCompatActivity {
     private Toolbar toolbar;
     private CoordinatorLayout contentView;
 
@@ -57,7 +57,6 @@ public class BaseActivityWithToolbar extends AppCompatActivity {
     }
 
     private void initToolbar() {
-   //     toolbar = (Toolbar) findViewById(R.id.base_toolbar111);
         toolbar.setTitle("hello");
         setSupportActionBar(toolbar);
 
@@ -70,4 +69,5 @@ public class BaseActivityWithToolbar extends AppCompatActivity {
     public Toolbar getToolbar() {
         return toolbar;
     }
+
 }
