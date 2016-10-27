@@ -6,18 +6,109 @@
     tools:context="com.example.huanghuishun.myschedule.ui.activity.AddWalletItemActivity"
     android:id="@+id/location_root">
 
-    <Switch
-        android:layout_width="wrap_content"
+
+        <Switch
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/switch2"
+            android:checked="false"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:text="支出"
+            android:padding="10dp"
+            android:gravity="center"
+            android:textOff="支出"
+            android:textOn="收入"
+            android:textColor="#ffffff"
+            android:textSize="15sp"
+            android:layout_gravity="right" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_gravity="center_horizontal"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:id="@+id/linearLayout"
+            android:layout_below="@+id/switch2"
+            android:layout_alignParentStart="true">
+
+            <EditText
+                android:layout_width="240dp"
+                android:layout_height="100dp"
+                android:inputType="number"
+                android:ems="10"
+                android:id="@+id/editText"
+                android:text="20.00"
+                android:layout_centerInParent="true"
+                android:layout_alignWithParentIfMissing="true"
+                android:gravity="bottom|center"
+                android:textSize="60sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_below="@+id/linearLayout"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="20dp"
+            android:id="@+id/linearLayout4">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"></LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/linearLayout2"></LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/switch1"
-        android:checked="false"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:text="支出"
-        android:padding="10dp"
-        android:gravity="center"
-        android:textOff="支出"
-        android:textOn="收入"
-        android:textColor="#ffffff"
-        android:textSize="15sp" />
+        android:layout_above="@+id/linearLayout2"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/linearLayout4"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="20dp">
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/editText2"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            style="@style/Widget.AppCompat.EditText"
+            android:gravity="top|left"
+            android:textSize="16sp"
+            android:hint="是否需要写点备注呢？" />
+    </RelativeLayout>
+
 </RelativeLayout>
