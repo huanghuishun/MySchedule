@@ -27,6 +27,7 @@ import com.example.huanghuishun.myschedule.R;
 import com.example.huanghuishun.myschedule.adapter.CityChooseRVAdapter;
 import com.example.huanghuishun.myschedule.adapter.OnRecyclerItemClickListener;
 import com.example.huanghuishun.myschedule.adapter.SearchResultRVAdapter;
+import com.example.huanghuishun.myschedule.adapter.TitleItemDecoration;
 import com.example.huanghuishun.myschedule.entity.City;
 import com.example.huanghuishun.myschedule.entity.Weather;
 import com.example.huanghuishun.myschedule.sqlite.AllCitiesDatabaseHelper;
@@ -63,6 +64,7 @@ public class LocationActivity extends BaseActivityWithToolbar {
     public MyCitiesDatabaseHelper citiesDatabaseHelper;
 
     public CityChooseRVAdapter cityChooseRVAdapter;
+    private TitleItemDecoration itemDecoration;
     private Handler handler;
 
 
@@ -140,6 +142,7 @@ public class LocationActivity extends BaseActivityWithToolbar {
             @Override
             public void onItemClick(RecyclerView.ViewHolder holder) {
                 SQLiteDatabase db = citiesDatabaseHelper.getReadableDatabase();
+                recyclerView.removeItemDecoration(itemDecoration);
                 switch (holder.getItemViewType()) {
                     case CityChooseRVAdapter.ITEM_MINE:
                         int position = holder.getLayoutPosition();
@@ -208,9 +211,9 @@ public class LocationActivity extends BaseActivityWithToolbar {
             public void onLongClick(RecyclerView.ViewHolder holder) {
                 SQLiteDatabase db = citiesDatabaseHelper.getReadableDatabase();
                 int position = holder.getLayoutPosition();
-                final Weather weather = weatherList.get(position);
                 switch (holder.getItemViewType()) {
                     case CityChooseRVAdapter.ITEM_MINE:
+                        final Weather weather = weatherList.get(position);
                         AlertDialog.Builder builder = new AlertDialog.Builder(LocationActivity.this)
                                 .setTitle("是否删除？")
                                 .setPositiveButton("是", new DialogInterface.OnClickListener() {
@@ -341,10 +344,11 @@ public class LocationActivity extends BaseActivityWithToolbar {
     public void setAdapter() {
         location = new City();
         location.setName("hi！");
-
+        itemDecoration = new TitleItemDecoration(this,weatherList,cityList);
         cityChooseRVAdapter = new CityChooseRVAdapter(this, weatherList, location, cityList);
         recyclerView.setAdapter(cityChooseRVAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.addItemDecoration(itemDecoration,0);
     }
 
     /**
@@ -388,9 +392,12 @@ public class LocationActivity extends BaseActivityWithToolbar {
                 if (newText == null || "".equals(newText)) {
                     myLetterView.setVisibility(View.VISIBLE);
                     recyclerView.setAdapter(cityChooseRVAdapter);
+                    recyclerView.removeItemDecoration(itemDecoration);
+                    recyclerView.addItemDecoration(itemDecoration);
                 } else {
                     searchResultList = searchCity(newText);
                     recyclerView.setAdapter(new SearchResultRVAdapter(LocationActivity.this, searchResultList));
+                    recyclerView.removeItemDecoration(itemDecoration);
                     myLetterView.setVisibility(View.GONE);
                 }
                 return true;
